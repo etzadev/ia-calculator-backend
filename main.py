@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from apps.calculator.route import router as calculator_router
-from constants import SERVER_URL, PORT, ENV, CORS_ORIGINS, GEMINI_API_KEY, GEMINI_MODEL
+from constants import SERVER_URL, PORT, ENV, CORS_ORIGINS, CORS_ORIGIN_REGEX, GEMINI_API_KEY, GEMINI_MODEL
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -14,6 +14,7 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
+    allow_origin_regex=CORS_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,6 +27,7 @@ async def root():
         "gemini_configured": bool(GEMINI_API_KEY),
         "gemini_model": GEMINI_MODEL,
         "cors_origins": CORS_ORIGINS,
+        "cors_origin_regex": CORS_ORIGIN_REGEX,
     }
 
 app.include_router(calculator_router, prefix="/calculate", tags=["calculate"])
