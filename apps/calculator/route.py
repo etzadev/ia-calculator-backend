@@ -50,12 +50,18 @@ async def run(data: ImageData, request: Request):
         responses = analyze_image(image, dict_of_vars=data.dict_of_vars)
     except Exception as e:
         error_message = str(e)
-        print(f"Error al analizar la imagen: {error_message}")
+        print(f"Error al analizar la imagen: {type(e).__name__}: {error_message}", flush=True)
 
-        if "API_KEY" in error_message or "api key" in error_message.lower():
+        if "GEMINI_API_KEY" in error_message:
+            detail = "Falta configurar GEMINI_API_KEY en Railway."
+        elif "API_KEY" in error_message or "api key" in error_message.lower():
             detail = "La API key de Gemini no es valida o no esta configurada."
         elif "NOT_FOUND" in error_message or "not found" in error_message.lower():
             detail = "El modelo Gemini configurado no existe o no soporta generateContent."
+        elif "permission" in error_message.lower() or "permission_denied" in error_message.lower():
+            detail = "Gemini rechazo la solicitud por permisos. Revisa la API key y que Gemini API este habilitada."
+        elif "timeout" in error_message.lower() or "deadline" in error_message.lower():
+            detail = "Gemini tardo demasiado en responder. Intenta con una seleccion mas pequena del canvas."
         elif "quota" in error_message.lower() or "rate" in error_message.lower():
             detail = "Gemini rechazo la solicitud por cuota o limite de frecuencia."
         else:

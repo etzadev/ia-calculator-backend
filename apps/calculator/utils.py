@@ -4,9 +4,11 @@ from google.genai import types
 from PIL import Image
 from constants import GEMINI_API_KEY, GEMINI_MODEL
 
-client = genai.Client(api_key=GEMINI_API_KEY)
-
 def analyze_image(img: Image.Image, dict_of_vars: dict):
+    if not GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY no esta configurada en el backend.")
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
     dict_of_vars_str = json.dumps(dict_of_vars, ensure_ascii=False)
     prompt = (
         f"Se te ha dado una imagen con algunas expresiones matemáticas, ecuaciones o problemas gráficos, y necesitas resolverlas. "
